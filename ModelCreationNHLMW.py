@@ -16,7 +16,6 @@ def getIndividualStat(statName,team,df,avg=False):
         statName(String) - the name of the stat to be found.
         team(String) - the abbrieviation of the desired team.
         df(DataFrame) - the available game data.
-        gameWindow(Int) - the number of recent games to use.
         avg(Bool) - whether or not to calculate the average.
     
     Returns:
@@ -69,7 +68,6 @@ def getWinsLoses(team,df):
     Parameters:
         team(String) - the abbrieviation of the desired team.
         df(DataFrame) - the available game data.
-        gameWindow(Int) - the number of recent games to use.
     
     Returns:
         wins(Int) - the number of games the team won.
@@ -106,7 +104,6 @@ def getStreak(team,df):
     Parameters:
         team(String) - the abbrieviation of the desired team.
         df(DataFrame) - the available game data.
-        gameWindow(Int) - the number of recent games to use.
     
     Returns:
         streak(Int) - the number of games won or lost in a row.
@@ -166,7 +163,7 @@ def calculateCORSI(shotAttemptsFor,shotAttemptsAgainst,average=False):
             else:
                 return shotAttemptsFor/(shotAttemptsAgainst + shotAttemptsFor)
             
-def collectDataForTeam(team,df,gameDate,gameWindow):
+def collectDataForTeam(team,df,gameWindow):
     """Collect all the stats for a certain team before a game.
     
     Parameters:
@@ -186,33 +183,33 @@ def collectDataForTeam(team,df,gameDate,gameWindow):
 
     
     #collect stats
-    goals = getIndividualStat("Score",team,df,gameWindow)
-    goalsAvg = getIndividualStat("Score",team,df,gameWindow,True)
-    goals5v5 = getIndividualStat("Score5v5",team,df,gameWindow)
-    goals5v5Avg = getIndividualStat("Score5v5",team,df,gameWindow,True)
-    goalsClose5v5 = getIndividualStat("ScoreClose5v5",team,df,gameWindow)
-    goalsClose5v5Avg = getIndividualStat("ScoreClose5v5",team,df,gameWindow,True)
-    shots = getIndividualStat("Shots",team,df,gameWindow)
-    shotsAvg = getIndividualStat("Shots",team,df,gameWindow,True)
-    shotAttempts = getIndividualStat("Shot_Attempts",team,df,gameWindow)
-    shotAttempts5v5 = getIndividualStat("Shot_Attempts5v5",team,df,gameWindow)
-    shotAttemptsClose5v5 = getIndividualStat("Shot_AttemptsClose5v5",team,df,gameWindow)
-    faceOffs = getIndividualStat("FO",team,df,gameWindow)
-    hits = getIndividualStat("Hits",team,df,gameWindow)
-    hitsAvg = getIndividualStat("Hits",team,df,gameWindow,True)
-    pims = getIndividualStat("PIM",team,df,gameWindow)
-    pimsAvg = getIndividualStat("PIM",team,df,gameWindow,True)
-    blocks = getIndividualStat("Blocks",team,df,gameWindow)
-    blocksAvg = getIndividualStat("Blocks",team,df,gameWindow,True)
-    giveAways = getIndividualStat("Give",team,df,gameWindow)
-    giveAwaysAvg = getIndividualStat("Give",team,df,gameWindow,True)
-    takeAways = getIndividualStat("Take",team,df,gameWindow)
-    takeAwaysAvg = getIndividualStat("Take",team,df,gameWindow,True)
-    PPO = getIndividualStat("PPO",team,df,gameWindow)
-    PPG = getIndividualStat("PPG",team,df,gameWindow)
+    goals = getIndividualStat("Score",team,df)
+    goalsAvg = getIndividualStat("Score",team,df,True)
+    goals5v5 = getIndividualStat("Score5v5",team,df)
+    goals5v5Avg = getIndividualStat("Score5v5",team,df,True)
+    goalsClose5v5 = getIndividualStat("ScoreClose5v5",team,df)
+    goalsClose5v5Avg = getIndividualStat("ScoreClose5v5",team,df,True)
+    shots = getIndividualStat("Shots",team,df)
+    shotsAvg = getIndividualStat("Shots",team,df,True)
+    shotAttempts = getIndividualStat("Shot_Attempts",team,df)
+    shotAttempts5v5 = getIndividualStat("Shot_Attempts5v5",team,df)
+    shotAttemptsClose5v5 = getIndividualStat("Shot_AttemptsClose5v5",team,df)
+    faceOffs = getIndividualStat("FO",team,df)
+    hits = getIndividualStat("Hits",team,df)
+    hitsAvg = getIndividualStat("Hits",team,df,True)
+    pims = getIndividualStat("PIM",team,df)
+    pimsAvg = getIndividualStat("PIM",team,df,True)
+    blocks = getIndividualStat("Blocks",team,df)
+    blocksAvg = getIndividualStat("Blocks",team,df,True)
+    giveAways = getIndividualStat("Give",team,df)
+    giveAwaysAvg = getIndividualStat("Give",team,df,True)
+    takeAways = getIndividualStat("Take",team,df)
+    takeAwaysAvg = getIndividualStat("Take",team,df,True)
+    PPO = getIndividualStat("PPO",team,df)
+    PPG = getIndividualStat("PPG",team,df)
 
     #get wins and loses
-    winsLoses = getWinsLoses(team,df,gameWindow)
+    winsLoses = getWinsLoses(team,df)
 
     #calculate shooting percentage
     if shots[0] == 0:
@@ -288,6 +285,7 @@ def createFrame(df,dfOut,gameWindow):
     """
     #iterate through all games
     for i in df.Game_Id.unique():
+        print(i)
         #home and away teams as well as the season
         away = df[df['Game_Id'] == i].Away_Team.unique()[0]
         home = df[df['Game_Id'] == i].Home_Team.unique()[0]
@@ -307,10 +305,10 @@ def createFrame(df,dfOut,gameWindow):
         gameData = df[(df["Date"] < date) & (df["season"] == season)]
         
         #get away data for away teams
-        awayTeamData = collectDataForTeam(away,gameData,date,gameWindow)
+        awayTeamData = collectDataForTeam(away,gameData,gameWindow)
 
         #get home data
-        homeTeamData = collectDataForTeam(home,gameData,date,gameWindow)
+        homeTeamData = collectDataForTeam(home,gameData,gameWindow)
 
         #begin the row with the game, away team and home team ids.
         lst = [i,regOrOT,away,home,season]
@@ -490,18 +488,6 @@ def main(create,model):
                     "TakeAgainst",
                     "TakeAvg",
                     "TakeAgainstAvg",
-                    "XGFor",
-                    "XGAgainst",
-                    "XGForAvg",
-                    "XGAgainstAvg",
-                    "XGFor5v5",
-                    "XGAgainst5v5",
-                    "XGFor5v5Avg",
-                    "XGAgainst5v5Avg",
-                    "XGFor5v5Close",
-                    "XGAgainst5v5Close",
-                    "XGFor5v5CloseAvg",
-                    "XGAgainst5v5CloseAvg",
                     "PP%",
                     "PK%",
                     "sh%",
@@ -540,21 +526,11 @@ def main(create,model):
     elif model == "DT":
         classifier = DecisionTreeClassifier(random_state=random.seed(1415))
 
-    #where results are stored
-    scores = []
-    f1 = []
-    logs = []
-    featureImportance = []
-
     #read in the game data
     newTrainDF = pd.read_csv("NHLOutput.csv")
 
     #score the model
-    score, f1Score, logLoss, featureImp = movingWindow(classifier,newTrainDF)
-    scores.append(score)
-    f1.append(f1Score)
-    logs.append(logLoss)
-    featureImportance.append(featureImp)
+    score, f1Score, logLoss = movingWindow(classifier,newTrainDF)
     
     #write the moving window results to a csv
     with open('MWResults' + model + '.csv','w', encoding='UTF8', newline='') as f:
@@ -564,19 +540,19 @@ def main(create,model):
         row = ["Accuracy","","F1 Score","","Log Loss"]
         writer.writerow(row)
 
-        for i in range(len(scores[0])):
+        for i in range(len(score)):
             row = []
-            row.append(scores[i])
+            row.append(score[i])
             row.append("")
-            row.append(f1[i])
+            row.append(f1Score[i])
             row.append("")
-            row.append(logs[i])
+            row.append(logLoss[i])
     
             writer.writerow(row)
 
     f.close
 
-    return scores
+    return score
 
-main(True,"LR")
+main(False,"LR")
  
