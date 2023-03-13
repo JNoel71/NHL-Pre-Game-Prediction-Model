@@ -21,7 +21,7 @@ def createTrainingFrame(lst):
         season = season[season["Game_Id"] < 30000]
 
         #create a unique Game_Id by adding the year the game took place to the current Game_Id string
-        seasonString = i[21:25]
+        seasonString = i[8:12]
         season['Game_Id'] = seasonString + season['Game_Id'].astype(str)
         season = season.iloc[:,1:] #remove the index column
 
@@ -50,7 +50,7 @@ def countGoalsAndRecordEnding(df,v5=False,close=False):
     ending = 'REG'
 
     #game end event
-    endingStats = df[(df['Event'] == 'GEND')]
+    endingStats = df[df['Event'] == 'GEND']
 
     #account for missing GEND event
     if endingStats['Period'].values.size == 0:
@@ -419,8 +419,11 @@ def main():
     #create a scoring difference column to be used in the close calculations
     trainingFrame['Score_Diff'] = (trainingFrame['Away_Score']-trainingFrame['Home_Score']).abs()
 
+    print(trainingFrame)
+
     #iterate through all games
     for i in trainingFrame.Game_Id.unique():
+        print(i)
         #row to store in df
         row = [i,str(i)[0:4],trainingFrame[trainingFrame['Game_Id'] == i].Date.unique()[0]]
 
@@ -434,31 +437,31 @@ def main():
         #count different statistics
         shots = countShots(away,home,gameFrame)
         shotAttempts = countShotAttempts(away,home,gameFrame)
-        goals = countGoalsAndRecordEnding(away,home,gameFrame)
+        goals = countGoalsAndRecordEnding(gameFrame)
         hits = countHits(away,home,gameFrame)
         blocks = countBlocks(away,home,gameFrame)
         fo = countFaceoffs(away,home,gameFrame)
         give = countGiveAways(away,home,gameFrame)
         take = countTakeAways(away,home,gameFrame)
         pims = countPenaltyMins(away,home,gameFrame)
-        PPG = countPPG(away,home,gameFrame)
+        PPG = countPPG(away,gameFrame)
 
         #count 5v5 stats
         shots5v5 = countShots(away,home,gameFrame,True)
         shotAttempts5v5 = countShotAttempts(away,home,gameFrame,True)
-        goals5v5 = countGoalsAndRecordEnding(away,home,gameFrame,True)
+        goals5v5 = countGoalsAndRecordEnding(gameFrame,True)
         blocks5v5 = countBlocks(away,home,gameFrame,True)
 
         #count close stats
         shotsClose = countShots(away,home,gameFrame,False,True)
         shotAttemptsClose = countShotAttempts(away,home,gameFrame,False,True)
-        goalsClose = countGoalsAndRecordEnding(away,home,gameFrame,False,True)
+        goalsClose = countGoalsAndRecordEnding(gameFrame,False,True)
         blocksClose = countBlocks(away,home,gameFrame,False,True)
 
         #count 5v5 close stats
         shotsClose5v5 = countShots(away,home,gameFrame,True,True)
         shotAttemptsClose5v5 = countShotAttempts(away,home,gameFrame,True,True)
-        goalsClose5v5 = countGoalsAndRecordEnding(away,home,gameFrame,True,True)
+        goalsClose5v5 = countGoalsAndRecordEnding(gameFrame,True,True)
         blocksClose5v5 = countBlocks(away,home,gameFrame,True,True)
 
         #give take ratios
